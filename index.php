@@ -11,7 +11,7 @@ if(isset($url)) {
   $m3ufile = file_get_contents($url);
 } else {
   //$m3ufile = file_get_contents('http://pastebin.com/raw/t1mBJ2Yi');
-  //$m3ufile = file_get_contents('M38U BACKUP URL HERE');
+  $m3ufile = file_get_contents('https://iptv-org.github.io/iptv/categories/xxx.m3u');
 }
 
 //$m3ufile = str_replace('tvg-', 'tvg_', $m3ufile);
