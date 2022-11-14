@@ -1,33 +1,51 @@
 <?php
 
 //Source: https://github.com/onigetoc/m3u8-PHP-Parser/blob/master/m3u-parser-simple.php
-//Use: http://localhost/dispatch.php?link=www.google.com
+//Use: index.php?callback=jQuery112403360297908445591&url=https://pastebin.com/raw/t1mBJ2Yi
+//USe: index.php?url=https://raw.githubusercontent.com/onigetoc/m3u8-PHP-Parser/master/ressources/demofile.m3u
 
+<?php
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('allow-origin: *');
+
+header("Access-Control-Allow-Headers: ACCEPT, CONTENT-TYPE, X-CSRF-TOKEN");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE");
+//header('Access-Control-Allow-Origin: http://www.foo.com', false);
 
 $url = $_GET["url"];
 
 if(isset($url)) {
   $m3ufile = file_get_contents($url);
 } else {
-  //$m3ufile = file_get_contents('http://pastebin.com/raw/t1mBJ2Yi');
-  $m3ufile = file_get_contents('https://iptv-org.github.io/iptv/categories/xxx.m3u');
+  //$url = "https://pastebin.com/raw/t1mBJ2Yi";
+  $url = "https://raw.githubusercontent.com/onigetoc/iptv-playlists/master/general/tv/us.m3u";
+  $m3ufile = file_get_contents($url);
 }
-
-//$m3ufile = str_replace('tvg-', 'tvg_', $m3ufile);
-$m3ufile = str_replace('group-title', 'tvgroup', $m3ufile);
-$m3ufile = str_replace("tvg-", "tv", $m3ufile);
 
 //$re = '/#(EXTINF|EXTM3U):(.+?)[,]\s?(.+?)[\r\n]+?((?:https?|rtmp):\/\/(?:\S*?\.\S*?)(?:[\s)\[\]{};"\'<]|\.\s|$))/';
 $re = '/#EXTINF:(.+?)[,]\s?(.+?)[\r\n]+?((?:https?|rtmp):\/\/(?:\S*?\.\S*?)(?:[\s)\[\]{};"\'<]|\.\s|$))/';
-$attributes = '/([a-zA-Z0-9\-]+?)="([^"]*)"/';
+//$attributes = '/([a-zA-Z0-9\-]+?)="([^"]*)"/';
+$attributes = '/([a-zA-Z0-9\-\_]+?)="([^"]*)"/';
+
+
+$m3ufile = str_replace('tvg-logo', 'thumb_square', $m3ufile);
+$m3ufile = str_replace('tvg-id', 'id', $m3ufile);
+//$m3ufile = str_replace('tvg-name', 'group', $m3ufile);
+//$m3ufile = str_replace('tvg-name', 'name', $m3ufile);
+$m3ufile = str_replace('tvg-name', 'author', $m3ufile);
+$m3ufile = str_replace('group-title', 'group', $m3ufile);
+$m3ufile = str_replace('tvg-country', 'country', $m3ufile);
+$m3ufile = str_replace('tvg-language', 'language', $m3ufile);
+
+//print_r($m3ufile);
+
+//$m3ufile = str_replace(' ', '_', $m3ufile); // FOR GROUP
 
 preg_match_all($re, $m3ufile, $matches);
 
 // Print the entire match result
 //print_r($matches);
-
-$i = 1;
 
 $items = array();
 
@@ -47,9 +65,13 @@ $items = array();
 
    $newdata =  array (
     //'ATTRIBUTE' => $matchList[2],
-    'id' => $i++,
-    'tvtitle' => $matchList[2],
-    'tvmedia' => $mediaURL
+    'service' => "iptv",
+    'title' => $matchList[2],
+    //'playlistURL' => (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",
+    //'playlistURL' => str_replace("url=","",$_SERVER['QUERY_STRING']),
+    'playlistURL' => $url,
+    'media_url' => $mediaURL,
+    'url' => $mediaURL
     );
     
     preg_match_all($attributes, $list, $matches, PREG_SET_ORDER);
@@ -66,13 +88,32 @@ $items = array();
     
  }
 
+//   $globalitem =  array (
+//    //'ATTRIBUTE' => $matchList[2],
+//    'item' => $items
+//    );
+
+//$globalitem[$items] ;
+//$globalitems['item'] = $items;
+
+//$globalist['list'] = $globalitems;
+
+   $globalitems =  array (
+    //'ATTRIBUTE' => $matchList[2],
+    'service' => "iptv",
+    'title' => "iptv",
+    'item' => $items,
+    );
+
+  $globalist['list'] = $globalitems;
+
 //print_r($items);
 
 $callback= $_GET['callback'];
 
   if($callback)
-    echo $callback. '(' . json_encode($items) . ')';  // jsonP callback
+    echo $callback. '(' . json_encode($globalist) . ')';  // jsonP callback
   else
-    echo json_encode($items);
+    echo json_encode($globalist);
 
 ?>
