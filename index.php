@@ -4,7 +4,6 @@
 //Use: index.php?callback=jQuery112403360297908445591&url=https://pastebin.com/raw/t1mBJ2Yi
 //USe: index.php?url=https://raw.githubusercontent.com/onigetoc/m3u8-PHP-Parser/master/ressources/demofile.m3u
 
-<?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('allow-origin: *');
